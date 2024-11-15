@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حروف الفبای فارسی</title>
+    <style>
+        @font-face {
+            font-family: 'BKoodak';
+            src: url('BKoodak.ttf') format('truetype');
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #93FB52;
+        }
+
+        .container {
+            position: relative;
+            width: 80%;
+            height: 80%;
+            border: 2px solid black;
+            box-sizing: border-box;
+        }
+
+        .letter {
+            position: absolute;
+            font-size: 64px;
+            font-family: 'BKoodak', sans-serif;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.6);
+            cursor: pointer;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <!-- حروف الفبای فارسی اینجا اضافه می‌شوند -->
+    </div>
+    <script>
+        const letters = [
+            'ا', 'ب', 'پ', 'ت', 'ث', 'ج', 'چ', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'ژ', 'س',
+            'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ک', 'گ', 'ل', 'م', 'ن', 'و', 'ه', 'ی'
+        ];
+
+        const colors = [
+            'red', 'blue', 'yellow', 'green', 'orange', 'purple', 'brown', 'pink',
+            'cyan', 'magenta', 'lime', 'teal'
+        ];
+
+        const container = document.getElementById('container');
+
+        // add letters to board
+        letters.forEach((letter, index) => {
+            const div = document.createElement('div');
+            div.className = 'letter';
+            div.textContent = letter;
+            div.style.color = colors[index % colors.length];
+            div.style.left = `${Math.random() * 90}%`;
+            div.style.top = `${Math.random() * 90}%`;
+            container.appendChild(div);
+        });
+
+        let selectedLetter = null;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        function startDrag(e) {
+            e.preventDefault();
+            if (e.type === 'mousedown' || e.type === 'touchstart') {
+                const target = e.target;
+                if (target.classList.contains('letter')) {
+                    selectedLetter = target;
+                    const rect = target.getBoundingClientRect();
+                    const event = e.type === 'touchstart' ? e.touches[0] : e;
+                    offsetX = event.clientX - rect.left;
+                    offsetY = event.clientY - rect.top;
+
+                    document.addEventListener('mousemove', moveLetter);
+                    document.addEventListener('mouseup', stopDrag);
+                    document.addEventListener('touchmove', moveLetter);
+                    document.addEventListener('touchend', stopDrag);
+                }
+            }
+        }
+
+        function moveLetter(e) {
+            if (selectedLetter) {
+                const event = e.type === 'touchmove' ? e.touches[0] : e;
+                const containerRect = container.getBoundingClientRect();
+
+                let newX = event.clientX - offsetX;
+                let newY = event.clientY - offsetY;
+
+                // Ensure the letter stays inside the container
+                newX = Math.max(containerRect.left, Math.min(containerRect.right - selectedLetter.offsetWidth, newX));
+                newY = Math.max(containerRect.top, Math.min(containerRect.bottom - selectedLetter.offsetHeight, newY));
+
+                selectedLetter.style.left = `${newX - containerRect.left}px`;
+                selectedLetter.style.top = `${newY - containerRect.top}px`;
+            }
+        }
+
+        function stopDrag() {
+            if (selectedLetter) {
+                document.removeEventListener('mousemove', moveLetter);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchmove', moveLetter);
+                document.removeEventListener('touchend', stopDrag);
+                selectedLetter = null;
+            }
+        }
+
+        container.addEventListener('mousedown', startDrag);
+        container.addEventListener('touchstart', startDrag, { passive: false });
+    </script>
+</body>
+</html>
